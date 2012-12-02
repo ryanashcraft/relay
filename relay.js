@@ -92,10 +92,12 @@ It.prototype.perform = function(callback) {
 	runBefores();
 }
 
-var Run = function(parent, op, befores, afters) {
+var Run = function(parent, op, befores, afters, timeout) {
 	this.parent = parent;
 	this.op = op;
 	this.expects = [];
+	this.timeout = timeout;
+	this.ran = false;
 
 	if (befores)
 		this.befores = befores;
@@ -111,10 +113,26 @@ Run.prototype.toString = function() {
 Run.prototype.perform = function(callback) {
 	var self = this;
 
+	var runTimeout;
+	if (self.timeout) {
+		runTimeout = setTimeout(function() {
+			self.ran = true;
+			loop(0, self.expects.length, function(i, next) {
+				enter(self.expects[i], next);
+			}, callback);
+		}, self.timeout);
+	}
+
 	this.op(function() {
-		loop(0, self.expects.length, function(i, next) {
-			enter(self.expects[i], next);
-		}, callback);
+		if (!self.ran) {
+			if (runTimeout) {
+				clearTimeout(runTimeout);
+			}
+
+			loop(0, self.expects.length, function(i, next) {
+				enter(self.expects[i], next);
+			}, callback);
+		}
 	});
 }
 
@@ -151,7 +169,11 @@ Expect.prototype.toBe = function(other) {
 Expect.prototype.toEqual = function(other) {
 	this.other = other;
 
-	if (this.value.length != other.length) {
+	if ( (!this.value && other) || (this.value && !other) ) {
+		this.success = false;
+	} else if (this.value == other) {
+		this.success = true;
+	} else if (this.value.length != other.length) {
 		this.success = false;
 	} else {
 		this.success = true;
@@ -223,8 +245,8 @@ function it(name, op) {
 	relayPeek().children.push(new It(relayPeek(), name, op, relayPeek().befores, relayPeek().afters));
 }
 
-function runs(op) {
-	relayPeek().children.push(new Run(relayPeek(), op, relayPeek().befores, relayPeek().afters));
+function runs(op, timeout) {
+	relayPeek().children.push(new Run(relayPeek(), op, relayPeek().befores, relayPeek().afters, timeout));
 }
 
 function expect(val) {
