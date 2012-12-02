@@ -1,7 +1,9 @@
-var Describe = function(name, op, befores, afters) {
+var Describe = function(parent, name, op, befores, afters) {
+	this.parent = parent;
 	this.name = name;
 	this.op = op;
 	this.children = [];
+	this.id = describeCount++;
 
 	if (befores)
 		this.befores = befores;
@@ -15,7 +17,7 @@ var Describe = function(name, op, befores, afters) {
 }
 
 Describe.prototype.toString = function() {
-	return "[describe] " + this.name;
+	return this.name;
 }
 
 Describe.prototype.perform = function(callback) {
@@ -27,10 +29,13 @@ Describe.prototype.perform = function(callback) {
 	}, callback);
 }
 
-var It = function(name, op, befores, afters) {
+var It = function(parent, name, op, befores, afters) {
+	this.parent = parent;
 	this.name = name;
 	this.op = op;
 	this.children = [];
+	this.expects = [];
+	this.id = itCount++;
 
 	if (befores)
 		this.befores = befores;
@@ -44,21 +49,11 @@ var It = function(name, op, befores, afters) {
 }
 
 It.prototype.toString = function() {
-	return "[it] " + this.name;
+	return this.name;
 }
 
 It.prototype.perform = function(callback) {
 	var self = this;
-	this.op();
-
-	loop(0, self.children.length, function(i, next) {
-		enter(self.children[i], next);
-	}, callback);
-}
-
-It.prototype.perform = function(callback) {
-	var self = this;
-	this.op();
 
 	function runBefores() {
 		if (self.befores) {
@@ -71,8 +66,16 @@ It.prototype.perform = function(callback) {
 	}
 
 	function runMain() {
+		self.op();
+
 		loop(0, self.children.length, function(i, next) {
 			enter(self.children[i], next);
+		}, runExpects);
+	}
+
+	function runExpects() {
+		loop(0, self.expects.length, function(i, next) {
+			enter(self.expects[i], next);
 		}, runAfters);
 	}
 
@@ -89,7 +92,8 @@ It.prototype.perform = function(callback) {
 	runBefores();
 }
 
-var Run = function(op, befores, afters) {
+var Run = function(parent, op, befores, afters) {
+	this.parent = parent;
 	this.op = op;
 	this.expects = [];
 
@@ -114,7 +118,8 @@ Run.prototype.perform = function(callback) {
 	});
 }
 
-var Expect = function(value) {
+var Expect = function(parent, value) {
+	this.parent = parent;
 	this.success = false;
 	this.value = value;
 	this.other = null;
@@ -131,15 +136,60 @@ Expect.prototype.perform = function(callback) {
 
 Expect.prototype.toMatch = function(other) {
 	this.other = other;
-	this.success = (this.value == other);
+	var regex = new RegExp(other);
+	var matches = (this.value.match(regex));
+	this.success = (matches.length > 0);
 	this.type = "match";
 }
 
+Expect.prototype.toBe = function(other) {
+	this.other = other;
+	this.success = (this.value === other);
+	this.type = "be";
+}
+
+Expect.prototype.toEqual = function(other) {
+	this.other = other;
+
+	if (this.value.length != other.length) {
+		this.success = false;
+	} else {
+		this.success = true;
+
+		for (var i = 0; i < this.value.length; i++) {
+			if (this.value[i] != other[i]) {
+				this.success = false;
+				break;
+			}
+		}
+	}
+
+	this.type = "equal";
+}
+
+Expect.prototype.toBeUndefined = function() {
+	this.success = (this.val == undefined);
+	this.type = "undefined";
+}
+
+Expect.prototype.toBeNull = function() {
+	this.success = (this.val == null);
+	this.type = "null";
+}
+
 Expect.prototype.toString = function() {
-	var str = "[expect] " + this.value;
+	var str = "expected " + this.value;
 
 	if (this.type == "match") {
 		str += " to match " + this.other;
+	} else if (this.type == "be") {
+		str += " to be " + this.other;
+	} else if (this.type == "equal") {
+		str += " to equal " + this.other;
+	} else if (this.type == "undefined") {
+		str += " to be undefined";
+	} else if (this.type == "null") {
+		str += " to be null";
 	}
 
 	str += ": ";
@@ -158,38 +208,85 @@ function relayPeek() {
 }
 
 function describe(name, op) {
-	relayPeek().children.push(new Describe(name, op, relayPeek().befores, relayPeek().afters))
+	relayPeek().children.push(new Describe(relayPeek(), name, op, relayPeek().befores, relayPeek().afters))
 }
 
 function beforeEach(op) {
-	relayPeek().befores.push(new Run(op));
+	relayPeek().befores.push(new Run(relayPeek(), op));
 }
 
 function afterEach(op) {
-	relayPeek().afters.push(new Run(op));
+	relayPeek().afters.push(new Run(relayPeek(), op));
 }
 
 function it(name, op) {
-	relayPeek().children.push(new It(name, op, relayPeek().befores, relayPeek().afters));
+	relayPeek().children.push(new It(relayPeek(), name, op, relayPeek().befores, relayPeek().afters));
 }
 
 function runs(op) {
-	relayPeek().children.push(new Run(op, relayPeek().befores, relayPeek().afters));
+	relayPeek().children.push(new Run(relayPeek(), op, relayPeek().befores, relayPeek().afters));
 }
 
 function expect(val) {
-	var e = new Expect(val);
+	var e = new Expect(relayPeek(), val);
 	relayPeek().expects.push(e);
 	return e;
 }
 
 function enter(part, callback) {
-	console.log(part.toString());
+	displayEnter(part);
+
 	relayStack.push(part);
 	part.perform(function() {
-		relayStack.pop();
-		callback();
+		exit(callback)
 	});
+}
+
+function exit(callback) {
+	var part = relayStack.pop();
+
+	displayExit(part);
+
+	callback();
+}
+
+function displayEnter(part) {
+	if (part instanceof Describe || part instanceof It) {
+		var prefix = "";
+		if (part instanceof Describe) {
+			prefix = "describe";
+		} else if (part instanceof It) {
+			prefix = "it";
+		}
+
+		document.write("<li id=" + prefix + "-" + part.id + ">" + part.toString() + "</li>");
+		document.write("<ul>");
+	} else if (part instanceof Expect) {
+		var prefix = "";
+		var relevantParent = part.parent;
+
+		while (!(relevantParent instanceof Describe) && !(relevantParent instanceof It)) {
+			relevantParent = relevantParent.parent;
+		}
+
+		if (relevantParent instanceof Describe) {
+			prefix = "describe";
+		} else if (relevantParent instanceof It) {
+			prefix = "it";
+		}
+
+		if (part.success) {
+			document.getElementById(prefix + "-" + relevantParent.id).style.color = "green";
+		} else {
+			document.getElementById(prefix + "-" + relevantParent.id).style.color = "red";
+		}
+	}
+}
+
+function displayExit(part) {
+	if (part instanceof Describe || part instanceof It) {
+		document.write("</ul>");
+	}
 }
 
 function relay() {
@@ -215,3 +312,5 @@ function loop(iteration, end, operation, finishCallback) {
 var relayStack = [];
 var root = new Describe();
 relayStack.push(root);
+var describeCount = 0;
+var itCount = 0;
