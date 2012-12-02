@@ -1,5 +1,15 @@
 describe("A URL", function() {
 	describe("with http", function() {
+		beforeEach(function(done) {
+			console.log("before");
+			done();
+		});
+
+		afterEach(function(done) {
+			console.log("after");
+			done();
+		});
+
 		it("should be able to extract the domain", function() {
 			var url = "";
 
@@ -15,6 +25,7 @@ describe("A URL", function() {
 				done();
 			});
 		});
+
 		it("should be able to extract the domain", function() {
 			runs(function(done) {
 				setTimeout(function() {
