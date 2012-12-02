@@ -45,8 +45,10 @@ function exit(callback) {
 	callback();
 }
 
-function relay() {
-	console.log("Relay started with " + root.children.length + " Describes.");
+function relay(timeout) {
+	if (timeout) {
+		defaultTimeout = timeout;
+	}
 
 	loop(0, root.children.length, function(i, next) {
 		enter(root.children[i], next);
@@ -81,3 +83,4 @@ var root = new Describe();
 relayStack.push(root);
 var describeCount = 0;
 var itCount = 0;
+var defaultTimeout = null;

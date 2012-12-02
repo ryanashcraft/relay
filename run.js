@@ -2,18 +2,19 @@ var Run = function(parent, op, befores, afters, timeout) {
 	this.parent = parent;
 	this.op = op;
 	this.expects = [];
-	this.timeout = timeout;
 	this.ran = false;
+
+	if (timeout) {
+		this.timeout = timeout;
+	} else if (defaultTimeout) {
+		this.timeout = defaultTimeout
+	}
 
 	if (befores)
 		this.befores = befores;
 
 	if (afters)
 		this.afters = afters;
-}
-
-Run.prototype.toString = function() {
-	return "[run]";
 }
 
 Run.prototype.perform = function(callback) {
@@ -29,7 +30,7 @@ Run.prototype.perform = function(callback) {
 		}, self.timeout);
 	}
 
-	this.op(function() {
+	self.op(function() {
 		if (!self.ran) {
 			if (runTimeout) {
 				clearTimeout(runTimeout);
@@ -38,6 +39,10 @@ Run.prototype.perform = function(callback) {
 			loop(0, self.expects.length, function(i, next) {
 				enter(self.expects[i], next);
 			}, callback);
+		} else {
+			console.error("Warning: run block completed after timed out.");
 		}
+
+		// self.ran = true;
 	});
 }
