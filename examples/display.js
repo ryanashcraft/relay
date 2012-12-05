@@ -11,7 +11,11 @@ displayListener.onEnter = function(part) {
 
 		document.write("<li id=" + prefix + "-" + part.id + ">" + part.toString() + "</li>");
 		document.write("<ul>");
-	} else if (part instanceof Expect) {
+	}
+}
+
+displayListener.onExit = function(part) {
+	if (part instanceof Expect) {
 		var prefix = "";
 		var relevantParent = part.parent;
 
@@ -25,15 +29,16 @@ displayListener.onEnter = function(part) {
 			prefix = "it";
 		}
 
-		if (part.success) {
+		var alreadyFailed = document.getElementById(prefix + "-" + relevantParent.id).dataset['failed'];
+		if (part.success && !alreadyFailed) {
 			document.getElementById(prefix + "-" + relevantParent.id).style.color = "green";
-		} else {
+		} else if (!alreadyFailed) {
 			document.getElementById(prefix + "-" + relevantParent.id).style.color = "red";
+			document.getElementById(prefix + "-" + relevantParent.id).dataset['failed'] = true;
+			document.write(part.callerLine);
 		}
 	}
-}
 
-displayListener.onExit = function(part) {
 	if (part instanceof Describe || part instanceof It) {
 		document.write("</ul>");
 	}
