@@ -1,9 +1,10 @@
-var Expect = function(parent, value) {
+var Expect = function(parent, value, callerLine) {
 	this.parent = parent;
 	this.success = false;
 	this.value = value;
 	this.other = null;
 	this.type = "";
+	this.callerLine = callerLine;
 
 	if (value) {
 		this.success = true;
@@ -18,7 +19,7 @@ Expect.prototype.toMatch = function(other) {
 	this.other = other;
 	var regex = new RegExp(other);
 	var matches = (this.value.match(regex));
-	this.success = (matches.length > 0);
+	this.success = (matches && matches.length > 0);
 	this.type = "match";
 }
 
