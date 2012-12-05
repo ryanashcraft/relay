@@ -23,7 +23,7 @@ function runs(op, timeout) {
 }
 
 function expect(val) {
-	var e = new Expect(relayPeek(), val);
+	var e = new Expect(relayPeek(), val, getCallerLineNumber());
 	relayPeek().expects.push(e);
 	return e;
 }
@@ -65,6 +65,19 @@ function loop(iteration, end, operation, finishCallback) {
 	} else {
 		return finishCallback();
 	}
+}
+
+function getCallerLineNumber() {
+	function getErrorObject() {
+		try { throw Error('') } catch(error) { return error; }
+	}
+
+	var error = getErrorObject();
+	var line = error.stack.split("\n")[5];
+	var lineRegex = /[^\(]*\(([^\)]*)\)/ig;
+	var result = lineRegex.exec(line);
+
+	return result[1];
 }
 
 function addListener(listener) {
