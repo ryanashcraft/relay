@@ -68,16 +68,15 @@ function loop(iteration, end, operation, finishCallback) {
 }
 
 function getCallerLineNumber() {
-	function getErrorObject() {
-		try { throw Error('') } catch(error) { return error; }
+	try {
+		throw Error('')
+	} catch(error) {
+		var line = error.stack.split("\n")[5];
+		var lineRegex = /[^\(]*\(([^\)]*)\)/ig;
+		var result = lineRegex.exec(line);
+
+		return result[1];
 	}
-
-	var error = getErrorObject();
-	var line = error.stack.split("\n")[5];
-	var lineRegex = /[^\(]*\(([^\)]*)\)/ig;
-	var result = lineRegex.exec(line);
-
-	return result[1];
 }
 
 function addListener(listener) {
