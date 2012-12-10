@@ -3,7 +3,7 @@ function relayPeek() {
 }
 
 function describe(name, op) {
-	relayPeek().children.push(new Describe(relayPeek(), name, op, relayPeek().befores, relayPeek().afters))
+	relayPeek().children.push(new Describe(relayPeek(), name, op, relayPeek().befores.slice(0), relayPeek().afters.slice(0)))
 }
 
 function beforeEach(op) {
@@ -15,11 +15,11 @@ function afterEach(op) {
 }
 
 function it(name, op) {
-	relayPeek().children.push(new It(relayPeek(), name, op, relayPeek().befores, relayPeek().afters));
+	relayPeek().children.push(new It(relayPeek(), name, op, relayPeek().befores.slice(0), relayPeek().afters.slice(0)));
 }
 
 function runs(op, timeout) {
-	relayPeek().children.push(new Run(relayPeek(), op, relayPeek().befores, relayPeek().afters, timeout));
+	relayPeek().children.push(new Run(relayPeek(), op, relayPeek().befores.slice(0), relayPeek().afters.slice(0), timeout));
 }
 
 function expect(val) {
