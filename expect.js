@@ -29,27 +29,76 @@ Expect.prototype.toBe = function(other) {
 	this.type = "be";
 }
 
+function isArray(a) {
+	return Object.prototype.toString.apply(a) === '[object Array]';
+}
+
+function isObject(a) {
+	return typeof a == "object";
+}
+
+function isEqual(a, b) {
+	if ( (!a && b) || (a && !b) ) {
+		return false;
+	} else if (a == b) {
+		return true;
+	} else if (isArray(a)) {
+		if (!isArray(b)) {
+			return false;
+		} else if (a.length != b.length) {
+			return false;
+		} else {
+			for (var i = 0; i < a.length; i++) {
+				if (a[i] != b[i]) {
+					return false;
+				}
+			}
+			return true;
+		}
+	} else if (isObject(a)){
+		if (!isObject(b)) {
+			return false;
+		}
+
+		var bMembersCount = 0;
+		for (var m in b) {
+			bMembersCount++;
+		}
+
+		var aMembersCount = 0;
+		for (var m in a) {
+			aMembersCount++;
+			if (b[m] == undefined) {
+				return false;
+			} else if (! isEqual(a[m], b[m]) ) {
+				return false;
+			}
+		}
+
+		if (bMembersCount != aMembersCount) {
+			return false;
+		}
+
+		return true;
+	} else {
+		return a == b;
+	}
+}
+
 Expect.prototype.toEqual = function(other) {
 	this.other = other;
 
-	if ( (!this.value && other) || (this.value && !other) ) {
-		this.success = false;
-	} else if (this.value == other) {
-		this.success = true;
-	} else if (this.value.length != other.length) {
-		this.success = false;
-	} else {
-		this.success = true;
-
-		for (var i = 0; i < this.value.length; i++) {
-			if (this.value[i] != other[i]) {
-				this.success = false;
-				break;
-			}
-		}
-	}
+	this.success = isEqual(this.value, other);
 
 	this.type = "equal";
+}
+
+Expect.prototype.toNotEqual = function(other) {
+	this.other = other;
+
+	this.success = !isEqual(this.value, other);
+
+	this.type = "not equal";
 }
 
 Expect.prototype.toBeUndefined = function() {
