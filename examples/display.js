@@ -17,11 +17,9 @@ displayListener.onEnter = function(part) {
 displayListener.onExit = function(part) {
 	if (part instanceof Expect) {
 		var prefix = "";
-		var relevantParent = part.parent;
-
-		while (!(relevantParent instanceof Describe) && !(relevantParent instanceof It)) {
-			relevantParent = relevantParent.parent;
-		}
+		var relevantParent = closestAncestor(part, function(ancestor) {
+			return (ancestor instanceof Describe) || (ancestor instanceof It);
+		});
 
 		if (relevantParent instanceof Describe) {
 			prefix = "describe";
