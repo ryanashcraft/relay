@@ -24,9 +24,13 @@ Run.prototype.perform = function(callback) {
 	if (self.timeout) {
 		runTimeout = setTimeout(function() {
 			self.ran = true;
+
 			loop(0, self.expects.length, function(i, next) {
 				enter(self.expects[i], next);
-			}, callback);
+			}, function() {
+				self.reset();
+				callback();
+			});
 		}, self.timeout);
 	}
 
@@ -38,11 +42,18 @@ Run.prototype.perform = function(callback) {
 
 			loop(0, self.expects.length, function(i, next) {
 				enter(self.expects[i], next);
-			}, callback);
+			}, function() {
+				self.reset();
+				callback();
+			});
 		} else {
 			console.error("Warning: run block completed after timed out.");
 		}
 
 		// self.ran = true;
 	});
+}
+
+Run.prototype.reset = function() {
+	this.ran = false;
 }
