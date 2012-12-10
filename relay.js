@@ -23,7 +23,7 @@ function runs(op, timeout) {
 }
 
 function expect(val) {
-	var e = new Expect(relayPeek(), val, getCallerLineNumber());
+	var e = new Expect(relayPeek(), val, getCallStack(10));
 	relayPeek().expects.push(e);
 	return e;
 }
@@ -67,16 +67,51 @@ function loop(iteration, end, operation, finishCallback) {
 	}
 }
 
-function getCallerLineNumber() {
+function closestAncestor(element, callback) {
+	if (!callback) {
+		return element.parent;
+	}
+
+	var ancestor = element.parent;
+
+	while (!callback(ancestor)) {
+		ancestor = ancestor.parent;
+	}
+
+	return ancestor;
+}
+
+function getCallStack(size) {
 	try {
 		throw Error('')
 	} catch(error) {
-		var line = error.stack.split("\n")[5];
-		var lineRegex = /[^\(]*\(([^\)]*)\)/ig;
-		var result = lineRegex.exec(line);
+		var frames = [];
+		var lines = error.stack.split("\n");
+		for (var i = 0; i < size && i < lines.length; i++) {
+			var line = lines[i];
+			var lineRegex = /[^\(]*\(([^\)]*)\)/ig;
+			var regexResult = lineRegex.exec(line);
+			if (regexResult && regexResult.length >= 2) {
+				frames.push(safeTagsReplace(regexResult[1]));
+			}
+		}
 
-		return result[1];
+		return frames;
 	}
+}
+
+var tagsToReplace = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;'
+};
+
+function replaceTag(tag) {
+    return tagsToReplace[tag] || tag;
+}
+
+function safeTagsReplace(str) {
+    return str.replace(/[&<>]/g, replaceTag);
 }
 
 function addListener(listener) {

@@ -1,10 +1,10 @@
-var Expect = function(parent, value, callerLine) {
+var Expect = function(parent, value, callStack) {
 	this.parent = parent;
 	this.success = false;
 	this.value = value;
 	this.other = null;
 	this.type = "";
-	this.callerLine = callerLine;
+	this.callStack = callStack;
 
 	if (value) {
 		this.success = true;
