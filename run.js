@@ -15,7 +15,7 @@ var Run = function(parent, op, befores, afters, timeout) {
 
 	if (afters)
 		this.afters = afters;
-}
+};
 
 Run.prototype.perform = function(callback) {
 	var self = this;
@@ -52,8 +52,8 @@ Run.prototype.perform = function(callback) {
 
 		// self.ran = true;
 	});
-}
+};
 
 Run.prototype.reset = function() {
 	this.ran = false;
-}
+};

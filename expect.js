@@ -9,11 +9,11 @@ var Expect = function(parent, value, callStack) {
 	if (value) {
 		this.success = true;
 	}
-}
+};
 
 Expect.prototype.perform = function(callback) {
 	callback();
-}
+};
 
 Expect.prototype.toMatch = function(other) {
 	this.other = other;
@@ -21,13 +21,13 @@ Expect.prototype.toMatch = function(other) {
 	var matches = (this.value.match(regex));
 	this.success = (matches && matches.length > 0);
 	this.type = "match";
-}
+};
 
 Expect.prototype.toBe = function(other) {
 	this.other = other;
 	this.success = (this.value === other);
 	this.type = "be";
-}
+};
 
 function isArray(a) {
 	return Object.prototype.toString.apply(a) === '[object Array]';
@@ -91,7 +91,7 @@ Expect.prototype.toEqual = function(other) {
 	this.success = isEqual(this.value, other);
 
 	this.type = "equal";
-}
+};
 
 Expect.prototype.toNotEqual = function(other) {
 	this.other = other;
@@ -99,17 +99,17 @@ Expect.prototype.toNotEqual = function(other) {
 	this.success = !isEqual(this.value, other);
 
 	this.type = "not equal";
-}
+};
 
 Expect.prototype.toBeUndefined = function() {
 	this.success = (this.val == undefined);
 	this.type = "undefined";
-}
+};
 
 Expect.prototype.toBeNull = function() {
 	this.success = (this.val == null);
 	this.type = "null";
-}
+};
 
 Expect.prototype.toString = function() {
 	var str = "expected " + this.value;
@@ -135,4 +135,4 @@ Expect.prototype.toString = function() {
 	}
 
 	return str;
-}
+};

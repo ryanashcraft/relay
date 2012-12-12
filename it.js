@@ -15,11 +15,11 @@ var It = function(parent, name, op, befores, afters) {
 		this.afters = afters;
 	else
 		this.afters = [];
-}
+};
 
 It.prototype.toString = function() {
 	return this.name;
-}
+};
 
 It.prototype.perform = function(callback) {
 	var self = this;
@@ -59,4 +59,4 @@ It.prototype.perform = function(callback) {
 	}
 
 	runBefores();
-}
+};
