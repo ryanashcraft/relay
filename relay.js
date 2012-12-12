@@ -18,8 +18,8 @@ function it(name, op) {
 	relayPeek().children.push(new It(relayPeek(), name, op, relayPeek().befores.slice(0), relayPeek().afters.slice(0)));
 }
 
-function runs(op, timeout) {
-	relayPeek().children.push(new Run(relayPeek(), op, relayPeek().befores.slice(0), relayPeek().afters.slice(0), timeout));
+function runs(op) {
+	relayPeek().children.push(new Run(relayPeek(), op, relayPeek().befores.slice(0), relayPeek().afters.slice(0)));
 }
 
 function expect(val) {
@@ -45,11 +45,7 @@ function exit(callback) {
 	callback();
 }
 
-function relay(timeout) {
-	if (timeout) {
-		defaultTimeout = timeout;
-	}
-
+function relay() {
 	loop(0, root.children.length, function(i, next) {
 		enter(root.children[i], next);
 	}, function() {
@@ -130,4 +126,3 @@ var root = new Describe();
 relayStack.push(root);
 var describeCount = 0;
 var itCount = 0;
-var defaultTimeout = null;

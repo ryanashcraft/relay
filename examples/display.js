@@ -1,3 +1,7 @@
+window.onload = function() {
+	relay();
+};
+
 var displayListener = new Listener();
 
 displayListener.onEnter = function(part) {
