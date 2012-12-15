@@ -119,11 +119,11 @@ Expect.prototype.resultString = function() {
 	var str = "expected " + JSON.stringify(this.value);
 
 	if (this.comparisonType == "match") {
-		str += " to match " + this.expectedValue;
+		str += " to match " + JSON.stringify(this.expectedValue);
 	} else if (this.comparisonType == "be") {
-		str += " to be " + this.expectedValue;
+		str += " to be " + JSON.stringify(this.expectedValue);
 	} else if (this.comparisonType == "equal") {
-		str += " to equal " + this.expectedValue;
+		str += " to equal " + JSON.stringify(this.expectedValue);
 	} else if (this.comparisonType == "undefined") {
 		str += " to be undefined";
 	} else if (this.comparisonType == "null") {

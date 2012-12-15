@@ -19,7 +19,6 @@ body {
 
 #relay_results ol {
 	list-style: none;
-	overflow-x: scroll;
 }
 
 #relay_results > ol > li {
