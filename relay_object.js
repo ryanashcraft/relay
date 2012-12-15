@@ -18,3 +18,15 @@ RelayObject.prototype.findFirstParent = function(callback) {
 
 	return ancestor;
 };
+
+RelayObject.prototype.typeString = function(callback) {
+	if (this && this.constructor && this.constructor.toString) {
+        var arr = this.constructor.toString().match(/function\s*(\w+)/);
+        
+        if (arr && arr.length == 2) {
+            return arr[1];
+        }
+    }
+    
+    return undefined;
+};

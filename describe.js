@@ -21,10 +21,6 @@ function Describe(info) {
 	}
 }
 
-Describe.prototype.toString = function() {
-	return this.name;
-}
-
 Describe.prototype.perform = function(callback) {
 	var self = this;
 	this.func();

@@ -22,10 +22,6 @@ function It(info) {
 	}
 };
 
-It.prototype.toString = function() {
-	return this.name;
-};
-
 It.prototype.perform = function(callback) {
 	var self = this;
 

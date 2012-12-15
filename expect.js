@@ -115,8 +115,8 @@ Expect.prototype.toBeNull = function() {
 	this.comparisonType = "null";
 };
 
-Expect.prototype.toString = function() {
-	var str = "expected " + this.value;
+Expect.prototype.resultString = function() {
+	var str = "Expected " + JSON.stringify(this.value);
 
 	if (this.comparisonType == "match") {
 		str += " to match " + this.expectedValue;
@@ -128,14 +128,6 @@ Expect.prototype.toString = function() {
 		str += " to be undefined";
 	} else if (this.comparisonType == "null") {
 		str += " to be null";
-	}
-
-	str += ": ";
-
-	if (this.success) {
-		str += "success";
-	} else {
-		str += "failure";
 	}
 
 	return str;

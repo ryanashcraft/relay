@@ -12,16 +12,18 @@ function relay() {
 	__relay_singleton__.relayStack = [];
 	__relay_singleton__.idCounter = 0;
 	var root = new Describe({
-		id: __relay_singleton__.idCounter,
+		id: __relay_singleton__.idCounter++,
 		parent: null
 	});
 	__relay_singleton__.relayStack.push(root);
 
 	__relay_singleton__.start = function() {
+		__relay_broadcast__("onRelayStart");
+
 		__relay_loop__(0, root.children.length, function(i, next) {
 			__relay_enter__(root.children[i], next);
 		}, function() {
-			__relay_broadcast__("onRelayEnd")
+			__relay_broadcast__("onRelayEnd");
 		});
 	};
 

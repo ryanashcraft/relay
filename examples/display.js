@@ -7,54 +7,77 @@ window.onload = function() {
 var displayListener = new RelayListener();
 
 displayListener.onRelayStart = function() {
+	var parentElement = document.getElementById("relay_results");
+	
+	var doneMessage = document.createElement("p");
+	doneMessage.innerHTML = "Relay started.";
+	parentElement.appendChild(doneMessage);
 
+	var rootList = document.createElement("ol");
+	parentElement.appendChild(rootList);
 }
 
 displayListener.onRelayEnd = function() {
-	document.write("<p><strong>Relay done.</strong></p>")
+	var parentElement = document.getElementById("relay_results");
+	
+	var doneMessage = document.createElement("p");
+	doneMessage.innerHTML = "Relay ended.";
+	parentElement.appendChild(doneMessage);
 }
 
 displayListener.onEnter = function(relayObject) {
 	if (relayObject.constructor == Describe || relayObject.constructor == It) {
-		var prefix = "";
-		if (relayObject.constructor == Describe) {
-			prefix = "describe";
-		} else if (relayObject.constructor == It) {
-			prefix = "it";
+		var relevantParent = relayObject.findFirstParent(function(ancestor) {
+			return (ancestor.constructor == Describe) || (ancestor.constructor == It);
+		});
+
+		var parentElement = document.getElementById(relevantParent.id);		
+		if (!parentElement) {
+			parentElement = document.getElementById("relay_results");
 		}
 
-		document.write("<li id=" + relayObject.id + ">" + relayObject.toString() + "</li>");
-		document.write("<ul>");
+		var parentList = parentElement.getElementsByTagName("ol")[0];
+
+		var listItem = document.createElement("li");
+		listItem.setAttribute("id", relayObject.id);
+		listItem.setAttribute("class", relayObject.typeString());
+		listItem.innerHTML = relayObject.name;
+		parentList.appendChild(listItem);
+		
+		var innerList = document.createElement("ol")
+		listItem.appendChild(innerList);
 	}
 }
 
 displayListener.onExit = function(relayObject) {
 	if (relayObject.constructor == Expect) {
-		var prefix = "";
 		var relevantParent = relayObject.findFirstParent(function(ancestor) {
 			return (ancestor.constructor == Describe) || (ancestor.constructor == It);
 		});
 
-		var alreadyFailed = document.getElementById(relevantParent.id).dataset['failed'];
+		var parentElement = document.getElementById(relevantParent.id);
+		var alreadyFailed = parentElement.dataset['failed'];
+
 		if (relayObject.success && !alreadyFailed) {
-			document.getElementById(relevantParent.id).style.color = "green";
+			parentElement.style.color = "green";
 		} else if (!alreadyFailed) {
-			document.getElementById(relevantParent.id).style.color = "red";
-			document.getElementById(relevantParent.id).dataset['failed'] = true;
+			parentElement.style.color = "red";
+			parentElement.dataset['failed'] = true;
 
-			document.write("<strong>Expected " + JSON.stringify(relayObject.value) + " to " + relayObject.type + " " + JSON.stringify(relayObject.other) + "</strong><br>");
+			var failureReason = document.createElement("p");
+			failureReason.setAttribute("class", "failure_reason");
+			failureReason.innerHTML = relayObject.resultString();
+			parentElement.appendChild(failureReason);
 			
+			var callStackList = document.createElement("ol");
+			callStackList.setAttribute("class", "callstack");
 			for (var i = 0; i < relayObject.callStack.length; i++) {
-				document.write(relayObject.callStack[i]);
-				if (i < relayObject.callStack.length - 2) {
-					document.write("<br>");
-				}
+				var callStackLine = document.createElement("li");
+				callStackLine.innerHTML = relayObject.callStack[i];
+				callStackList.appendChild(callStackLine);
 			}
+			parentElement.appendChild(callStackList);
 		}
-	}
-
-	if (relayObject.constructor == Describe || relayObject.constructor == It) {
-		document.write("</ul>");
 	}
 }
 
