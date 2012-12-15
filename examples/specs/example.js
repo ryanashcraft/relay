@@ -36,6 +36,7 @@ describe("A URL", function() {
 
 			runs(function(done) {
 				expect('www.google.com').toMatch('www.gogle.com');
+				expect('www.google.com').toMatch('www.froogle.com');
 				done();
 			});
 		});

@@ -84,7 +84,7 @@ function expect(val) {
 		id: __relay_next_id__(),
 		parent: __relay_stack_peek__(),
 		value: val,
-		callStack: __relay_callstack__(10)
+		caller: __relay_caller__()
 	});
 	__relay_stack_peek__().expects.push(e);
 	return e;
@@ -137,7 +137,7 @@ function __relay_loop__(iteration, end, operation, finishCallback) {
 	}
 }
 
-function __relay_callstack__(size) {
+function __relay_caller__() {
 	function replaceTag(tag) {
 		var tagsToReplace = {
 		    '&': '&amp;',
@@ -155,18 +155,24 @@ function __relay_callstack__(size) {
 	try {
 		throw Error('')
 	} catch(error) {
-		var frames = [];
+		var caller = null;
 		var lines = error.stack.split("\n");
-		for (var i = 0; i < size && i < lines.length; i++) {
+		for (var i = 0; i < lines.length; i++) {
 			var line = lines[i];
 			var lineRegex = /[^\(]*\(([^\)]*)\)/ig;
 			var regexResult = lineRegex.exec(line);
+
 			if (regexResult && regexResult.length >= 2) {
-				frames.push(safeTagsReplace(regexResult[1]));
+				var callerRegex = /specs\/(.*)$/ig;
+				var callerResult = callerRegex.exec(regexResult[1]);
+				if (callerResult && callerResult.length >= 2) {
+					caller = safeTagsReplace(callerResult[1]);
+					break;
+				}
 			}
 		}
 
-		return frames;
+		return caller;
 	}
 }
 

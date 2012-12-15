@@ -56,27 +56,26 @@ displayListener.onExit = function(relayObject) {
 		});
 
 		var parentElement = document.getElementById(relevantParent.id);
-		var alreadyFailed = parentElement.dataset['failed'];
+		var alreadyFailed = parentElement.getAttribute("class") == "failed";
 
 		if (relayObject.success && !alreadyFailed) {
-			parentElement.style.color = "green";
-		} else if (!alreadyFailed) {
-			parentElement.style.color = "red";
-			parentElement.dataset['failed'] = true;
+			parentElement.setAttribute("class", "succeeded");
+		}
+
+		if (!relayObject.success && !alreadyFailed) {
+			parentElement.setAttribute("class", "failed");
+		}
+
+		if (!relayObject.success) {
+			var parentList = parentElement.getElementsByTagName("ol")[0];
 
 			var failureReason = document.createElement("p");
-			failureReason.setAttribute("class", "failure_reason");
+			failureReason.setAttribute("class", "reason");
 			failureReason.innerHTML = relayObject.resultString();
-			parentElement.appendChild(failureReason);
-			
-			var callStackList = document.createElement("ol");
-			callStackList.setAttribute("class", "callstack");
-			for (var i = 0; i < relayObject.callStack.length; i++) {
-				var callStackLine = document.createElement("li");
-				callStackLine.innerHTML = relayObject.callStack[i];
-				callStackList.appendChild(callStackLine);
+			if (relayObject.caller) {
+				failureReason.innerHTML += " on " + relayObject.caller;
 			}
-			parentElement.appendChild(callStackList);
+			parentList.appendChild(failureReason);
 		}
 	}
 }

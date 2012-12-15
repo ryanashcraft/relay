@@ -8,7 +8,7 @@ function Expect(info) {
 	this.value = info.value;
 	this.expectedValue = null;
 	this.comparisonType = "";
-	this.callStack = info.callStack;
+	this.caller = info.caller;
 
 	if (info.value) {
 		this.success = true;
@@ -116,7 +116,7 @@ Expect.prototype.toBeNull = function() {
 };
 
 Expect.prototype.resultString = function() {
-	var str = "Expected " + JSON.stringify(this.value);
+	var str = "expected " + JSON.stringify(this.value);
 
 	if (this.comparisonType == "match") {
 		str += " to match " + this.expectedValue;

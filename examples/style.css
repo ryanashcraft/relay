@@ -42,14 +42,22 @@ body {
 	margin-bottom: 0;
 }
 
-.failure_reason {
-	font-weight: bold;
-}
-
 #relay_results ol.callstack:before {
 	content: "Callstack:";
 }
 
 #relay_results ol.callstack {
 	padding-left: 0;
+}
+
+#relay_results .succeeded {
+	color: green;
+}
+
+#relay_results .failed {
+	color: red;
+}
+
+#relay_results .reason {
+	font-weight: bold;
 }
