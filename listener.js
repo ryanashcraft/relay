@@ -1,10 +1,10 @@
 "use strict";
 
-var Listener = function() {
+var RelayListener = function() {
 	
 };
 
-Listener.prototype = {
+RelayListener.prototype = {
 	onRelayStart: function() { },
 	onRelayEnd: function() { },
 	onEnter: function(relayObject) { },

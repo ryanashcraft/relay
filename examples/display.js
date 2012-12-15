@@ -4,7 +4,7 @@ window.onload = function() {
 	relay().start();
 };
 
-var displayListener = new Listener();
+var displayListener = new RelayListener();
 
 displayListener.onRelayStart = function() {
 
