@@ -1,20 +1,25 @@
-var It = function(parent, name, op, befores, afters) {
-	this.parent = parent;
-	this.name = name;
-	this.op = op;
+"use strict";
+
+__relay_extend__(RelayObject, It);
+
+function It(info) {
+	RelayObject.call(this, info);
+	this.name = info.name;
+	this.func = info.func;
 	this.children = [];
 	this.expects = [];
-	this.id = itCount++;
 
-	if (befores)
-		this.befores = befores;
-	else
+	if (info.befores) {
+		this.befores = info.befores;
+	} else {
 		this.befores = [];
+	}
 
-	if (afters)
-		this.afters = afters;
-	else
+	if (info.afters) {
+		this.afters = info.afters;
+	} else {
 		this.afters = [];
+	}
 };
 
 It.prototype.toString = function() {
@@ -26,8 +31,8 @@ It.prototype.perform = function(callback) {
 
 	function runBefores() {
 		if (self.befores) {
-			loop(0, self.befores.length, function(i, next) {
-				enter(self.befores[i], next);
+			__relay_loop__(0, self.befores.length, function(i, next) {
+				__relay_enter__(self.befores[i], next);
 			}, runMain);
 		} else {
 			runMain();
@@ -35,23 +40,23 @@ It.prototype.perform = function(callback) {
 	}
 
 	function runMain() {
-		self.op();
+		self.func();
 
-		loop(0, self.children.length, function(i, next) {
-			enter(self.children[i], next);
+		__relay_loop__(0, self.children.length, function(i, next) {
+			__relay_enter__(self.children[i], next);
 		}, runExpects);
 	}
 
 	function runExpects() {
-		loop(0, self.expects.length, function(i, next) {
-			enter(self.expects[i], next);
+		__relay_loop__(0, self.expects.length, function(i, next) {
+			__relay_enter__(self.expects[i], next);
 		}, runAfters);
 	}
 
 	function runAfters() {
 		if (self.afters) {
-			loop(0, self.afters.length, function(i, next) {
-				enter(self.afters[i], next);
+			__relay_loop__(0, self.afters.length, function(i, next) {
+				__relay_enter__(self.afters[i], next);
 			}, callback);
 		} else {
 			callback();

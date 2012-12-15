@@ -1,83 +1,155 @@
-function relayPeek() {
-	return relayStack[relayStack.length - 1];
+"use strict";
+
+var __relay_singleton__ = null;
+
+function relay() {
+	if (__relay_singleton__ != null) {
+		return __relay_singleton__;
+	}
+
+	__relay_singleton__ = {};
+	__relay_singleton__.listeners = [];
+	__relay_singleton__.relayStack = [];
+	__relay_singleton__.idCounter = 0;
+	var root = new Describe({
+		id: __relay_singleton__.idCounter,
+		parent: null
+	});
+	__relay_singleton__.relayStack.push(root);
+
+	__relay_singleton__.start = function() {
+		__relay_loop__(0, root.children.length, function(i, next) {
+			__relay_enter__(root.children[i], next);
+		}, function() {
+			__relay_broadcast__("onRelayEnd")
+		});
+	};
+
+	return __relay_singleton__;
 }
 
-function describe(name, op) {
-	relayPeek().children.push(new Describe(relayPeek(), name, op, relayPeek().befores.slice(0), relayPeek().afters.slice(0)))
+function describe(name, func) {
+	__relay_stack_peek__().children.push(new Describe({
+		id: __relay_next_id__(),
+		parent: __relay_stack_peek__(),
+		name: name,
+		func: func,
+		befores: __relay_stack_peek__().befores.slice(0),
+		afters: __relay_stack_peek__().afters.slice(0)
+	}));
 }
 
-function beforeEach(op) {
-	relayPeek().befores.push(new Run(relayPeek(), op));
+function beforeEach(func) {
+	__relay_stack_peek__().befores.push(new Run({
+		id: __relay_next_id__(),
+		parent: __relay_stack_peek__(),
+		func: func
+	}));
 }
 
-function afterEach(op) {
-	relayPeek().afters.push(new Run(relayPeek(), op));
+function afterEach(func) {
+	__relay_stack_peek__().afters.push(new Run({
+		id: __relay_next_id__(),
+		parent: __relay_stack_peek__(),
+		func: func
+	}));
 }
 
-function it(name, op) {
-	relayPeek().children.push(new It(relayPeek(), name, op, relayPeek().befores.slice(0), relayPeek().afters.slice(0)));
+function it(name, func) {
+	__relay_stack_peek__().children.push(new It({
+		id: __relay_next_id__(),
+		parent: __relay_stack_peek__(),
+		name: name,
+		func: func,
+		befores: __relay_stack_peek__().befores.slice(0),
+		afters: __relay_stack_peek__().afters.slice(0)
+	}));
 }
 
-function runs(op) {
-	relayPeek().children.push(new Run(relayPeek(), op, relayPeek().befores.slice(0), relayPeek().afters.slice(0)));
+function runs(func) {
+	__relay_stack_peek__().children.push(new Run({
+		id: __relay_next_id__(),
+		parent: __relay_stack_peek__(),
+		name: name,
+		func: func,
+		befores: __relay_stack_peek__().befores.slice(0),
+		afters: __relay_stack_peek__().afters.slice(0)
+	}));
 }
 
 function expect(val) {
-	var e = new Expect(relayPeek(), val, getCallStack(10));
-	relayPeek().expects.push(e);
+	var e = new Expect({
+		id: __relay_next_id__(),
+		parent: __relay_stack_peek__(),
+		value: val,
+		callStack: __relay_callstack__(10)
+	});
+	__relay_stack_peek__().expects.push(e);
 	return e;
 }
 
-function enter(part, callback) {
-	broadcast("onEnter", part);
+function addRelayListener(listener) {
+	relay().listeners.push(listener);
+}
 
-	relayStack.push(part);
+function __relay_extend__(base, sub) {
+	function EmptyConstructor() { };
+	EmptyConstructor.prototype = base.prototype;
+	sub.prototype = new EmptyConstructor();
+	sub.prototype.constructor = sub;
+}
+
+function __relay_stack_peek__() {
+	var r = relay();
+	return r.relayStack[r.relayStack.length - 1];
+}
+
+function __relay_next_id__() {
+	return relay().idCounter++;
+}
+
+function __relay_enter__(part, callback) {
+	__relay_broadcast__("onEnter", part);
+
+	relay().relayStack.push(part);
 	part.perform(function() {
-		exit(callback)
+		__relay_exit__(callback);
 	});
 }
 
-function exit(callback) {
-	var part = relayStack.pop();
+function __relay_exit__(callback) {
+	var part = relay().relayStack.pop();
 
-	broadcast("onExit", part);
+	__relay_broadcast__("onExit", part);
 
 	callback();
 }
 
-function relay() {
-	loop(0, root.children.length, function(i, next) {
-		enter(root.children[i], next);
-	}, function() {
-		console.log("Relay done.");
-	});
-}
-
-function loop(iteration, end, operation, finishCallback) {
+function __relay_loop__(iteration, end, operation, finishCallback) {
 	if (iteration < end) {
 		operation(iteration, function() {
-			loop(iteration + 1, end, operation, finishCallback);
+			__relay_loop__(iteration + 1, end, operation, finishCallback);
 		});
 	} else {
 		return finishCallback();
 	}
 }
 
-function closestAncestor(element, callback) {
-	if (!callback) {
-		return element.parent;
+function __relay_callstack__(size) {
+	function replaceTag(tag) {
+		var tagsToReplace = {
+		    '&': '&amp;',
+		    '<': '&lt;',
+		    '>': '&gt;'
+		};
+	
+	    return tagsToReplace[tag] || tag;
 	}
 
-	var ancestor = element.parent;
-
-	while (!callback(ancestor)) {
-		ancestor = ancestor.parent;
+	function safeTagsReplace(str) {
+	    return str.replace(/[&<>]/g, replaceTag);
 	}
 
-	return ancestor;
-}
-
-function getCallStack(size) {
 	try {
 		throw Error('')
 	} catch(error) {
@@ -96,33 +168,8 @@ function getCallStack(size) {
 	}
 }
 
-var tagsToReplace = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;'
-};
-
-function replaceTag(tag) {
-    return tagsToReplace[tag] || tag;
-}
-
-function safeTagsReplace(str) {
-    return str.replace(/[&<>]/g, replaceTag);
-}
-
-function addListener(listener) {
-	listeners.push(listener);
-}
-
-function broadcast(message, param) {
-	for (var i = 0; i < listeners.length; i++) {
-		listeners[i][message](param);
+function __relay_broadcast__(message, param) {
+	for (var i = 0; i < relay().listeners.length; i++) {
+		relay().listeners[i][message](param);
 	}
 }
-
-var listeners = [];
-var relayStack = [];
-var root = new Describe();
-relayStack.push(root);
-var describeCount = 0;
-var itCount = 0;

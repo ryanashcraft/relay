@@ -1,21 +1,27 @@
-var Run = function(parent, op, befores, afters) {
-	this.parent = parent;
-	this.op = op;
+"use strict";
+
+__relay_extend__(RelayObject, Run);
+
+function Run(info) {
+	RelayObject.call(this, info);
+	this.func = info.func;
 	this.expects = [];
 
-	if (befores)
-		this.befores = befores;
+	if (info.befores) {
+		this.befores = info.befores;
+	}
 
-	if (afters)
-		this.afters = afters;
+	if (info.afters) {
+		this.afters = info.afters;
+	}
 };
 
 Run.prototype.perform = function(callback) {
 	var self = this;
 
-	self.op(function() {
-		loop(0, self.expects.length, function(i, next) {
-			enter(self.expects[i], next);
+	self.func(function() {
+		__relay_loop__(0, self.expects.length, function(i, next) {
+			__relay_enter__(self.expects[i], next);
 		}, function() {
 			callback();
 		});

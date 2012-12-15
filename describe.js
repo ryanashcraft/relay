@@ -1,19 +1,24 @@
-var Describe = function(parent, name, op, befores, afters) {
-	this.parent = parent;
-	this.name = name;
-	this.op = op;
+"use strict";
+
+__relay_extend__(RelayObject, Describe);
+
+function Describe(info) {
+	RelayObject.call(this, info);
+	this.name = info.name;
+	this.func = info.func;
 	this.children = [];
-	this.id = describeCount++;
 
-	if (befores)
-		this.befores = befores;
-	else
+	if (info.befores) {
+		this.befores = info.befores;
+	} else {
 		this.befores = [];
+	}
 
-	if (afters)
-		this.afters = afters;
-	else
+	if (info.afters) {
+		this.afters = info.afters;
+	} else {
 		this.afters = [];
+	}
 }
 
 Describe.prototype.toString = function() {
@@ -22,9 +27,9 @@ Describe.prototype.toString = function() {
 
 Describe.prototype.perform = function(callback) {
 	var self = this;
-	this.op();
+	this.func();
 
-	loop(0, this.children.length, function(i, next) {
-		enter(self.children[i], next);
+	__relay_loop__(0, this.children.length, function(i, next) {
+		__relay_enter__(self.children[i], next);
 	}, callback);
 }

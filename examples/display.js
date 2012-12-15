@@ -1,55 +1,61 @@
+"use strict";
+
 window.onload = function() {
-	relay();
+	relay().start();
 };
 
 var displayListener = new Listener();
 
-displayListener.onEnter = function(part) {
-	if (part instanceof Describe || part instanceof It) {
+displayListener.onRelayStart = function() {
+
+}
+
+displayListener.onRelayEnd = function() {
+	document.write("<p><strong>Relay done.</strong></p>")
+}
+
+displayListener.onEnter = function(relayObject) {
+	if (relayObject.constructor == Describe || relayObject.constructor == It) {
 		var prefix = "";
-		if (part instanceof Describe) {
+		if (relayObject.constructor == Describe) {
 			prefix = "describe";
-		} else if (part instanceof It) {
+		} else if (relayObject.constructor == It) {
 			prefix = "it";
 		}
 
-		document.write("<li id=" + prefix + "-" + part.id + ">" + part.toString() + "</li>");
+		document.write("<li id=" + relayObject.id + ">" + relayObject.toString() + "</li>");
 		document.write("<ul>");
 	}
 }
 
-displayListener.onExit = function(part) {
-	if (part instanceof Expect) {
+displayListener.onExit = function(relayObject) {
+	if (relayObject.constructor == Expect) {
 		var prefix = "";
-		var relevantParent = closestAncestor(part, function(ancestor) {
-			return (ancestor instanceof Describe) || (ancestor instanceof It);
+		var relevantParent = relayObject.findFirstParent(function(ancestor) {
+			return (ancestor.constructor == Describe) || (ancestor.constructor == It);
 		});
 
-		if (relevantParent instanceof Describe) {
-			prefix = "describe";
-		} else if (relevantParent instanceof It) {
-			prefix = "it";
-		}
-
-		var alreadyFailed = document.getElementById(prefix + "-" + relevantParent.id).dataset['failed'];
-		if (part.success && !alreadyFailed) {
-			document.getElementById(prefix + "-" + relevantParent.id).style.color = "green";
+		var alreadyFailed = document.getElementById(relevantParent.id).dataset['failed'];
+		if (relayObject.success && !alreadyFailed) {
+			document.getElementById(relevantParent.id).style.color = "green";
 		} else if (!alreadyFailed) {
-			document.getElementById(prefix + "-" + relevantParent.id).style.color = "red";
-			document.getElementById(prefix + "-" + relevantParent.id).dataset['failed'] = true;
+			document.getElementById(relevantParent.id).style.color = "red";
+			document.getElementById(relevantParent.id).dataset['failed'] = true;
+
+			document.write("<strong>Expected " + JSON.stringify(relayObject.value) + " to " + relayObject.type + " " + JSON.stringify(relayObject.other) + "</strong><br>");
 			
-			for (var i = 0; i < part.callStack.length; i++) {
-				document.write(part.callStack[i]);
-				if (i < part.callStack.length - 2) {
+			for (var i = 0; i < relayObject.callStack.length; i++) {
+				document.write(relayObject.callStack[i]);
+				if (i < relayObject.callStack.length - 2) {
 					document.write("<br>");
 				}
 			}
 		}
 	}
 
-	if (part instanceof Describe || part instanceof It) {
+	if (relayObject.constructor == Describe || relayObject.constructor == It) {
 		document.write("</ul>");
 	}
 }
 
-addListener(displayListener);
+addRelayListener(displayListener);

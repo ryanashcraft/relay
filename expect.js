@@ -1,12 +1,16 @@
-var Expect = function(parent, value, callStack) {
-	this.parent = parent;
-	this.success = false;
-	this.value = value;
-	this.other = null;
-	this.type = "";
-	this.callStack = callStack;
+"use strict";
 
-	if (value) {
+__relay_extend__(RelayObject, Expect);
+
+function Expect(info) {
+	RelayObject.call(this, info);
+	this.success = false;
+	this.value = info.value;
+	this.expectedValue = null;
+	this.comparisonType = "";
+	this.callStack = info.callStack;
+
+	if (info.value) {
 		this.success = true;
 	}
 };
@@ -15,18 +19,18 @@ Expect.prototype.perform = function(callback) {
 	callback();
 };
 
-Expect.prototype.toMatch = function(other) {
-	this.other = other;
-	var regex = new RegExp(other);
+Expect.prototype.toMatch = function(expectedValue) {
+	this.expectedValue = expectedValue;
+	var regex = new RegExp(expectedValue);
 	var matches = (this.value.match(regex));
 	this.success = (matches && matches.length > 0);
-	this.type = "match";
+	this.comparisonType = "match";
 };
 
-Expect.prototype.toBe = function(other) {
-	this.other = other;
-	this.success = (this.value === other);
-	this.type = "be";
+Expect.prototype.toBe = function(expectedValue) {
+	this.expectedValue = expectedValue;
+	this.success = (this.value === expectedValue);
+	this.comparisonType = "be";
 };
 
 function isArray(a) {
@@ -85,44 +89,44 @@ function isEqual(a, b) {
 	}
 }
 
-Expect.prototype.toEqual = function(other) {
-	this.other = other;
+Expect.prototype.toEqual = function(expectedValue) {
+	this.expectedValue = expectedValue;
 
-	this.success = isEqual(this.value, other);
+	this.success = isEqual(this.value, expectedValue);
 
-	this.type = "equal";
+	this.comparisonType = "equal";
 };
 
-Expect.prototype.toNotEqual = function(other) {
-	this.other = other;
+Expect.prototype.toNotEqual = function(expectedValue) {
+	this.expectedValue = expectedValue;
 
-	this.success = !isEqual(this.value, other);
+	this.success = !isEqual(this.value, expectedValue);
 
-	this.type = "not equal";
+	this.comparisonType = "not equal";
 };
 
 Expect.prototype.toBeUndefined = function() {
 	this.success = (this.val == undefined);
-	this.type = "undefined";
+	this.comparisonType = "undefined";
 };
 
 Expect.prototype.toBeNull = function() {
 	this.success = (this.val == null);
-	this.type = "null";
+	this.comparisonType = "null";
 };
 
 Expect.prototype.toString = function() {
 	var str = "expected " + this.value;
 
-	if (this.type == "match") {
-		str += " to match " + this.other;
-	} else if (this.type == "be") {
-		str += " to be " + this.other;
-	} else if (this.type == "equal") {
-		str += " to equal " + this.other;
-	} else if (this.type == "undefined") {
+	if (this.comparisonType == "match") {
+		str += " to match " + this.expectedValue;
+	} else if (this.comparisonType == "be") {
+		str += " to be " + this.expectedValue;
+	} else if (this.comparisonType == "equal") {
+		str += " to equal " + this.expectedValue;
+	} else if (this.comparisonType == "undefined") {
 		str += " to be undefined";
-	} else if (this.type == "null") {
+	} else if (this.comparisonType == "null") {
 		str += " to be null";
 	}
 
