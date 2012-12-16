@@ -19,7 +19,15 @@ function Run(info) {
 Run.prototype.perform = function(callback) {
 	var self = this;
 
+	var calledBack = false;
 	self.func(function() {
+		if (!calledBack) {
+			calledBack = true;
+		} else {
+			console.error("Relay asynchronous block received called back more than once");
+			return;
+		}
+
 		__relay_loop__(0, self.expects.length, function(i, next) {
 			__relay_enter__(self.expects[i], next);
 		}, function() {
