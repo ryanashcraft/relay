@@ -2,6 +2,7 @@
 
 var __relay_singleton__ = null;
 
+/* Public */
 function relay() {
 	if (__relay_singleton__ != null) {
 		return __relay_singleton__;
@@ -94,6 +95,28 @@ function addRelayListener(listener) {
 	relay().listeners.push(listener);
 }
 
+/* NOPs */
+function xdescribe() {
+
+}
+
+function xbeforeEach() {
+
+}
+
+function xafterEach() {
+
+}
+
+function xit() {
+
+}
+
+function xruns() {
+
+}
+
+/* Utility */
 function __relay_extend__(base, sub) {
 	function EmptyConstructor() { };
 	EmptyConstructor.prototype = base.prototype;
