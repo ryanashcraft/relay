@@ -183,11 +183,11 @@ function __relay_caller__() {
 		for (var i = 0; i < lines.length; i++) {
 			var line = lines[i];
 			var lineRegex = /[^\(]*\(([^\)]*)\)/ig;
-			var regexResult = lineRegex.exec(line);
+			var lineResult = lineRegex.exec(line);
 
-			if (regexResult && regexResult.length >= 2) {
-				var callerRegex = /specs\/(.*)$/ig;
-				var callerResult = callerRegex.exec(regexResult[1]);
+			if (lineResult && lineResult.length >= 2) {
+				var callerRegex = /\/specs\/([^\.]+\.js:[0-9]+:[0-9]+)$/ig;
+				var callerResult = callerRegex.exec(lineResult[1]);
 				if (callerResult && callerResult.length >= 2) {
 					caller = safeTagsReplace(callerResult[1]);
 					break;
