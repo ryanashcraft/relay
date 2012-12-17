@@ -16,16 +16,16 @@
 <h1>Relay</h1>
 <p>Relay is a behavior-driven JavaScript testing framework inspired in design by <a href="http://pivotal.github.com/jasmine">Jasmine</a>. The key difference between Relay and Jasmine is that Relay is written to be completely synchronous. Relay is also much smaller and has fewer features.</p>
 
-<h2>Writing Tests are Easy</h2>
+<h2>Writing Tests Are Easy</h2>
 
-<h3>describe: a suite of tests dealing with the same thing</h3>
+<h3>describe: A Suite of Tests Dealing with the Same Thing</h3>
 <pre class="prettyprint">describe("A suite", function() {
     it("contains specs with expectations", function() {
         expect(true).toBe(true);
     });
 });</pre>
 
-<h3>it: a specific case that has different expectations</h3>
+<h3>it: A Specification with Different Expectations</h3>
 <pre class="prettyprint">describe("A empty string", function() {  
     var s = "";
 
@@ -40,7 +40,7 @@
     });
 });</pre>
 
-<h3>expect: comparing what you got with what you expected</h3>
+<h3>expect: Comparing Actual Values with Expected Values</h3>
 <pre class="prettyprint">describe("An expect", function() {
     it("should be successful with just a boolean value", function() {
         expect(true);
@@ -91,7 +91,7 @@
     });
 });</pre>
 
-<h3>runs: giving async operations time to finish</h3>
+<h3>runs: Controlling the Flow of Asynchronous Operations</h3>
 <p>runs provide a callback to the function that must be called in order for Relay to proceed. runs provide a way to control the flow of asynchronous operations, as the done callback triggers the next runs to start.</p>
 <pre class="prettyprint">describe("A timeout", function() {  
      it("should be called when the time has elapsed", function() {
@@ -118,7 +118,7 @@
      });
 });</pre>
 
-<h3>beforeEach and afterEach: just like runs that is called before/after each it block</h3>
+<h3>beforeEach and afterEach: Code to Run Before/After Each it Block</h3>
 <p>beforeEach and afterEach behave just like runs, but they are called before/after each it function. They can accumulate if there are more than one in the scope of the it, and they are called in order of scope - outermost first, innermost last.</p>
 <pre class="prettyprint">describe("A number", function() {
      var i;
@@ -149,6 +149,6 @@
 
 </div>
 
-<div id="relay_results"></div>
+<div id="relay_results"><h1>A Running Example</h1></div>
 </body>
 </html>
