@@ -20,6 +20,7 @@ pre.prettyprint {
 	border: 1px solid #CCC;
 	padding: 10px;
 	margin-bottom: 10px;
+	font-size: 14px;
 }
 
 #relay_results,

@@ -113,7 +113,7 @@ describe("A number", function() {
 			expect(i).toBe(1);
 		});
 
-		it("when deccremented should be negativeone", function() {
+		it("when deccremented should be negative one", function() {
 			i--;
 			expect(i).toBe(-1);
 		});
