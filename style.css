@@ -14,11 +14,22 @@ h1, h2, h3, h4, p, pre {
 
 pre.prettyprint {
 	border: 0;
+	overflow: scroll;
+
+	background: #EEE;
+	border: 1px solid #CCC;
+	padding: 10px;
+	margin-bottom: 10px;
 }
 
 #relay_results,
 #about {
 	margin: 20px;
+}
+
+#about {
+	padding-bottom: 10px;
+	border-bottom: 1px dotted #CCC;
 }
 
 #relay_results > p {
