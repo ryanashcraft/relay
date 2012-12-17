@@ -12,6 +12,10 @@ h1, h2, h3, h4, p, pre {
 	margin: 10px 0 0 0;
 }
 
+pre.prettyprint {
+	border: 0;
+}
+
 #relay_results,
 #about {
 	margin: 20px;
@@ -80,12 +84,7 @@ h1, h2, h3, h4, p, pre {
 	font-weight: normal;
 	margin: 0 4px;
 	padding: 0 4px;
-	height: 11px;
-	line-height: 11px;
-	font-size: 11px;
-	opacity: 0.8;
-}
-
-#relay_results .duration.pending {
-	opacity: 1.0;
+	height: 14px;
+	line-height: 14px;
+	font-size: 14px;
 }

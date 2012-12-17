@@ -1,6 +1,10 @@
 "use strict";
 
 window.onload = function() {
+	// For syntax highlighting
+	prettyPrint();
+
+	// Start Relay
 	relay().start();
 };
 
@@ -120,15 +124,15 @@ function timeDifference(earlier, later) {
 	}
 
 	if (seconds > 0) {
-		str += seconds + " second" + (seconds > 1 ? "s" : "") + ", ";
+		str += seconds + "s, ";
 	}
 
 	if (milliseconds > 0) {
-		str += milliseconds + " millisecond" + (milliseconds > 1 ? "s" : "");
+		str += milliseconds + "ms";
 	}
 
 	if (str == "") {
-		str += "0 milliseconds";
+		str += "0ms";
 	}
 
 	return str;

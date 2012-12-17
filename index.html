@@ -3,15 +3,14 @@
 <head>
 <title>Relay</title>
 
+<link rel="stylesheet" href="extern/prettify/prettify.css">
 <link rel="stylesheet" href="style.css">
 
+<script src="extern/prettify/prettify.js"></script>
 <script src="relay.min.js"></script>
-
 <script src="display.js"></script>
-
 <script src="specs/introduction.js"></script>
 </head>
-
 <body>
 <div id="about">
 <h1>Relay</h1>
@@ -20,14 +19,14 @@
 <h2>Writing Tests are Easy</h2>
 
 <h3>describe: a suite of tests dealing with the same thing</h3>
-<pre>describe("A suite", function() {
+<pre class="prettyprint">describe("A suite", function() {
     it("contains specs with expectations", function() {
         expect(true).toBe(true);
     });
 });</pre>
 
 <h3>it: a specific case that has different expectations</h3>
-<pre>describe("A empty string", function() {  
+<pre class="prettyprint">describe("A empty string", function() {  
     var s = "";
 
     it("should have length 0", function() {
@@ -42,7 +41,7 @@
 });</pre>
 
 <h3>expect: comparing what you got with what you expected</h3>
-<pre>describe("An expect", function() {
+<pre class="prettyprint">describe("An expect", function() {
     it("should be successful with just a boolean value", function() {
         expect(true);
     });
@@ -94,7 +93,7 @@
 
 <h3>runs: giving async operations time to finish</h3>
 <p>runs provide a callback to the function that must be called in order for Relay to proceed. runs provide a way to control the flow of asynchronous operations, as the done callback triggers the next runs to start.</p>
-<pre>describe("A timeout", function() {  
+<pre class="prettyprint">describe("A timeout", function() {  
      it("should be called when the time has elapsed", function() {
           var timeoutCalled = false;
           var timeoutDuration = 500;
@@ -121,7 +120,7 @@
 
 <h3>beforeEach and afterEach: just like runs that is called before/after each it block</h3>
 <p>beforeEach and afterEach behave just like runs, but they are called before/after each it function. They can accumulate if there are more than one in the scope of the it, and they are called in order of scope - outermost first, innermost last.</p>
-<pre>describe("A number", function() {
+<pre class="prettyprint">describe("A number", function() {
      var i;
 
      it("has a default value of undefined", function() {
