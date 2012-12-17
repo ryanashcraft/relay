@@ -6,20 +6,30 @@
 body {
 	font-family: courier, monospace;
 	font-size: 14px;
-	line-height: 14px;
 }
 
-#relay_results {
+h1, h2, h3, h4, p, pre {
+	margin: 10px 0 0 0;
+}
+
+#relay_results,
+#about {
 	margin: 20px;
 }
 
 #relay_results > p {
 	font-weight: bold;
 	margin: 10px 0;
+	line-height: 14px;
 }
 
 #relay_results ol {
+	line-height: 14px;
 	list-style: none;
+}
+
+#relay_results ol p {
+	margin: 0;
 }
 
 #relay_results > ol > li {

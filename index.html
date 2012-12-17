@@ -1,19 +1,155 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Relay</title>
+<title>Relay</title>
 
-	<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css">
 
-	<script src="relay.min.js"></script>
+<script src="relay.min.js"></script>
 
-	<script src="display.js"></script>
+<script src="display.js"></script>
 
-	<script src="source/utilities.js"></script>
-	<script src="specs/utilities.js"></script>
-	<script src="specs/example.js"></script>
+<script src="specs/introduction.js"></script>
 </head>
+
 <body>
-	<div id="relay_results"></div>
+<div id="about">
+<h1>Relay</h1>
+<p>Relay is a behavior-driven JavaScript testing framework inspired in design by <a href="http://pivotal.github.com/jasmine">Jasmine</a>. The key difference between Relay and Jasmine is that Relay is written to be completely synchronous. Relay is also much smaller and has fewer features.</p>
+
+<h2>Writing Tests are Easy</h2>
+
+<h3>describe: a suite of tests dealing with the same thing</h3>
+<pre>describe("A suite", function() {
+    it("contains specs with expectations", function() {
+        expect(true).toBe(true);
+    });
+});</pre>
+
+<h3>it: a specific case that has different expectations</h3>
+<pre>describe("A empty string", function() {  
+    var s = "";
+
+    it("should have length 0", function() {
+        expect(s.length).toBe(0);
+    });
+
+    it("after concatenating with another string should equal the other string", function() {
+        var another = "foo";
+        expect((s + another).length).toBe(another.length)
+        expect(s + another).toEqual(another);
+    });
+});</pre>
+
+<h3>expect: comparing what you got with what you expected</h3>
+<pre>describe("An expect", function() {
+    it("should be successful with just a boolean value", function() {
+        expect(true);
+    });
+
+    it("should be successful with `toBeUndefined`", function() {
+        var i;
+        expect(i).toBeUndefined();
+    });
+
+    it("should be successful with `toBeNull`", function() {
+        var i = null;
+        expect(i).toBeNull();
+    });
+
+    it("should be successful when matching a string with a regular expression with `toMatch`", function() {
+        var a = "555.555.5555";
+        var b = "^[0-9]+\.[0-9]+\.[0-9]+$";
+        expect(a).toMatch(b);
+    });
+
+    it("should be successful when comparing two variables of the same reference with `toBe`", function() {
+        var i = 0;
+        var j = i;
+        expect(i).toBe(j);
+    });
+
+    it("should be successful when comparing two multi-level objects with `toEqual`", function() {
+        var a = {
+            url: "http://ryanashcraft.me/",
+            name: "Ryan Ashcraft",
+            favoriteColor: {
+                red: 4,
+                green: 99,
+                blue: 249
+            }
+        };
+        var b = {
+            name: "Ryan Ashcraft",
+            url: "http://ryanashcraft.me/",
+            favoriteColor: {
+                red: 4,
+                green: 99,
+                blue: 249
+            }
+        };
+        expect(a).toEqual(b);
+    });
+});</pre>
+
+<h3>runs: giving async operations time to finish</h3>
+<p>runs provide a callback to the function that must be called in order for Relay to proceed. runs provide a way to control the flow of asynchronous operations, as the done callback triggers the next runs to start.</p>
+<pre>describe("A timeout", function() {  
+     it("should be called when the time has elapsed", function() {
+          var timeoutCalled = false;
+          var timeoutDuration = 500;
+
+          // setTimeout is asynchronous, so it must be placed inside a runs block. When the
+          // asynchronous part has finished, it must call the done callback for Relay to
+          // continue.
+          runs(function(done) {
+               setTimeout(function() {
+                    timeoutCalled = true;
+                    done();
+               }, timeoutDuration);
+          });
+
+          // Since this expectation is required to be called after the previous runs finishes,
+          // it must also be encapsulated in a runs block and must call the done callback for
+          // Relay to continue.
+          runs(function(done) {
+               expect(timeoutCalled);
+               done();
+          });
+     });
+});</pre>
+
+<h3>beforeEach and afterEach: just like runs that is called before/after each it block</h3>
+<p>beforeEach and afterEach behave just like runs, but they are called before/after each it function. They can accumulate if there are more than one in the scope of the it, and they are called in order of scope - outermost first, innermost last.</p>
+<pre>describe("A number", function() {
+     var i;
+
+     it("has a default value of undefined", function() {
+          expect(i).toBeUndefined();
+     });
+     
+     describe("set to 0", function() {
+          // We need to reset i to 0 for each it block, and the easiest way to do that is with
+          // a beforeEach. The done callback must be called for Relay to continue.
+          beforeEach(function(done) {
+               i = 0;
+               done();
+          });
+
+          it("when incremented should be one", function() {
+               i++;
+               expect(i).toBe(1);
+          });
+
+          it("when deccremented should be negativeone", function() {
+               i--;
+               expect(i).toBe(-1);
+          });
+     });
+});</pre>
+
+</div>
+
+<div id="relay_results"></div>
 </body>
 </html>
